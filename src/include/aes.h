@@ -3,16 +3,24 @@
 
 class AES {
 public:
-	AES(std::string key, std::string plaintext);
-	std::string aes128();
-	std::string aes192();
-	std::string aes256();
+	AES(std::string key, std::string plaintext, int keySize=128);
+	static std::string generateKey128();
+	static std::string generateKey192();
+	static std::string generatekey256();
 
 private:
-	std::string makeStringKey();
-	std::string stringToHex(std::string str);
+	static std::vector<int> getRandomRefsIndexs(int number);
+	static std::string generateKey(int size);
+	static std::vector <std::string> keyRefs();
 
+	std::string stringToHex(std::string str);
+	std::vector<std::vector<std::string>> initStringMatrix(int row, int col);
+	// std::vector<std::vector<std::string>> stringToMatrix(std::string str, int row);
+
+	int keySize;
 	std::string key;
 	std::string plaintext;
 	std::vector<std::vector<std::string>> keyMatrix;
+
+	
 };

@@ -1,22 +1,22 @@
 #include <iostream>
-#include <string>
-#include <sstream>
+#include "include/aes.h"
 
 using namespace std;
 
 int main()
 {
-    string str = "satishcjisboring";
-    string str1;
-    stringstream sstrm;
+    string key128 = AES::generateKey128();
+    string key192 = AES::generateKey192();
+    string key256 = AES::generatekey256();
 
-    for (const auto& item : str)
-    {
-        sstrm << hex << int(item);
-    }
-    str1 = sstrm.str();
+    /*string key = "satishcjisboring";
+    string plaintext = "hello friend";
 
-    cout << "Hexadecimal Equivalent of String =  " << str << " is :" << str1;
+    AES blender = AES(key, plaintext);*/
 
+    std::cout << "key text 128: " << key128 << std::endl;
+    std::cout << "key text 192: " << key192 << std::endl;
+    std::cout << "key text 256: " << key256 << std::endl;
+   
     return 0;
 }
