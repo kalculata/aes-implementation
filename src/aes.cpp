@@ -1,12 +1,23 @@
 #include <iostream>
+#include <sstream>
+
 #include "include/aes.h"
 
-std::string AES::aes128(std::string key) {
-	return "cipher 128";
+
+std::string AES::stringToHex(std::string str) {
+    std::stringstream sstrm;
+
+    for (const auto& item : str)
+    {
+        sstrm << std::hex << int(item);
+    }
+    return sstrm.str();
 }
-std::string AES::aes192(std::string key) {
-	return "cipher 192";
+
+AES::AES(std::string key, std::string message) {
+	this->key = key;
 }
-std::string AES::aes256(std::string key) {
-	return "cipher 256";
+
+std::string AES::makeStringKey() {
+
 }

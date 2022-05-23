@@ -1,10 +1,22 @@
 #include <iostream>
-#include "include/aes.h"
+#include <string>
+#include <sstream>
 
-#define LOG(x) std::cout << x << std::endl;
+using namespace std;
 
-int main() {
-	std::string message = "la cryptographie n'est pas facile.";
-	std::string key = "key";
-	LOG(AES::aes128(key, message));
+int main()
+{
+    string str = "satishcjisboring";
+    string str1;
+    stringstream sstrm;
+
+    for (const auto& item : str)
+    {
+        sstrm << hex << int(item);
+    }
+    str1 = sstrm.str();
+
+    cout << "Hexadecimal Equivalent of String =  " << str << " is :" << str1;
+
+    return 0;
 }
