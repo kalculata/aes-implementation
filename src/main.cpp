@@ -8,9 +8,10 @@ void logMatrix(vector<vector<std::string>>);
 
 int main()
 {
-    string key = "satishcjisboring";
+    //string key = "satishcjisboring";
+    string key = AES::generatekey256();
    
-    AES aes = AES(key);
+    AES aes = AES(key, AES::USE_AES_256);
 
     logMatrix(aes.getKeyMatrix());
    

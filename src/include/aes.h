@@ -26,6 +26,7 @@ private:
 	static std::string getSubString(std::string str, int startindex, int lastindex);
 
 	std::vector<std::vector<std::string>> formatKey();
+	void keyExpansion();
 	std::string stringToHex(std::string str);
 
 	int keySize = 0;

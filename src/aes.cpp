@@ -12,6 +12,9 @@ AES::AES(std::string key, int keySize, int mode) {
         return;
     }
 
+    std::cout << key.length() << std::endl;
+    std::cout << key << std::endl;
+
     if (key.length() > keySize / 8) {
         std::cout << "key must be of length: " << keySize / 8 << std::endl;
         std::cout << "subject key: " << getSubString(key, 0, keySize/8) << std::endl;
@@ -25,7 +28,7 @@ AES::AES(std::string key, int keySize, int mode) {
 
 std::vector <std::string>  AES::keyRefs() {
     static const std::vector <std::string> refs{
-        "0","1","2","3","4","5","6","7","8","9","10",
+        "0","1","2","3","4","5","6","7","8","9",
         "a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z",
         "+","-","/","*","!","?",".", "#","@","(",")","[","]","%","|","\\","$","-","&", ";", ",", "="
     };
@@ -70,6 +73,10 @@ std::string AES::stringToHex(std::string str) {
         sstrm << std::hex << int(item);
     }
     return sstrm.str();
+}
+
+void AES::keyExpansion()
+{
 }
 
 std::string AES::getSubString(std::string str, int startindex, int lastindex) {
