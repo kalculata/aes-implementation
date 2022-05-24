@@ -6,35 +6,21 @@
 #include "include/aes.h"
 
 
-AES::AES(std::string key, std::string plaintext, int keySize) {
+AES::AES(std::string key, int keySize, int mode) {
     if (keySize != 128 && keySize != 192 && keySize != 256) {
         std::cout << "invalid key size";
         return;
     }
 
+    if (key.length() > keySize / 8) {
+        std::cout << "key must be of length: " << keySize / 8 << std::endl;
+        std::cout << "subject key: " << getSubString(key, 0, keySize/8) << std::endl;
+        key = getSubString(key, 0, keySize / 8);
+    }
+
     this->keySize = keySize;
     this->key = stringToHex(key);
-    this->plaintext = plaintext;
-    // this->keyMatrix = stringToMatrix(this->key);
-
-}
-
-std::string AES::stringToHex(std::string str) {
-    std::stringstream sstrm;
-
-    for (const auto& item : str)
-    {
-        sstrm << std::hex << int(item);
-    }
-    return sstrm.str();
-}
-
-std::vector<std::vector<std::string>> AES::initStringMatrix(int row, int col) {
-    std::vector<std::vector<std::string>> matrix;
-    for (int i = 0; i < row; i++) {
-        matrix.push_back(std::vector<std::string>(col, ""));
-    }
-    return matrix;
+    this->keyMatrix =  formatKey();
 }
 
 std::vector <std::string>  AES::keyRefs() {
@@ -55,6 +41,43 @@ std::vector<int> AES::getRandomRefsIndexs(int number) {
         indexs[i] = rand() % keyRefs().size();
     }
     return indexs;
+}
+
+std::vector<std::vector<std::string>> AES::formatKey() {
+    std::vector<std::string> row(keySize / 32);
+    std::vector<std::vector<std::string>> fkey(4, row);
+    std::string t;
+    int cursor = 0;
+
+    for (int j=0; j<keySize/32; j++) {
+        for (int i=0; i<4; i++) {
+            t = "";
+            t += key[cursor];
+            t += key[cursor + 1];
+            fkey[i][j] = t;
+            cursor+=2;
+        }
+    }
+
+    return fkey;
+}
+
+std::string AES::stringToHex(std::string str) {
+    std::stringstream sstrm;
+
+    for (const auto& item : str)
+    {
+        sstrm << std::hex << int(item);
+    }
+    return sstrm.str();
+}
+
+std::string AES::getSubString(std::string str, int startindex, int lastindex) {
+    std::string output = "";
+    for (int i = startindex; i < lastindex; i++) {
+        output += str[i];
+    }
+    return output;
 }
 
 std::string AES::generateKey(int size) {
