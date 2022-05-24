@@ -11,19 +11,30 @@ AES::AES(std::string key, int keySize, int mode) {
         std::cout << "invalid key size";
         return;
     }
-
-    std::cout << key.length() << std::endl;
-    std::cout << key << std::endl;
-
+    if (key.length() < keySize / 8) {
+        std::cout << "key is to short " << std::endl;
+        return;
+    }
     if (key.length() > keySize / 8) {
         std::cout << "key must be of length: " << keySize / 8 << std::endl;
         std::cout << "subject key: " << getSubString(key, 0, keySize/8) << std::endl;
         key = getSubString(key, 0, keySize / 8);
     }
-
+    switch (keySize) {
+        case 128:
+            round = 10;
+            break;
+        case 192:
+            round = 12;
+            break;
+        case 256:
+            round = 14;
+            break;
+    }
+    
     this->keySize = keySize;
     this->key = stringToHex(key);
-    this->keyMatrix =  formatKey();
+    this->keyMatrix = formatKey();
 }
 
 std::vector <std::string>  AES::keyRefs() {
@@ -75,8 +86,67 @@ std::string AES::stringToHex(std::string str) {
     return sstrm.str();
 }
 
-void AES::keyExpansion()
-{
+std::string AES::vecToBin(std::vector<std::string> vec) {
+    // implementation
+}
+
+std::vector<std::vector<std::string>> AES::transposed(std::vector<std::vector<std::string>> m) {
+    std::vector<std::string> row(m[0].size());
+    std::vector<std::vector<std::string>> m_t(m.size(), row);
+
+    for (int i = 0; i < m.size(); i++) {
+        for (int j = 0; j < m[0].size(); j++) {
+            m_t[i][j] = m[j][i];
+        }
+    }
+    return m_t;
+}
+
+std::vector<std::string> AES::g(std::vector<std::string> v) {
+   return roundConst(subWord(rotWord(v)));
+}
+
+std::vector<std::string> AES::xor_f(std::vector<std::string> a, std::vector<std::string> b) {
+    std::string a_bin = vecToBin(a);
+    std::string b_bin = vecToBin(b);
+
+    // implementation
+}
+
+std::vector<std::vector<std::string>> AES::generateSubKeys(std::vector<std::vector<std::string>> key) {
+    std::vector<std::string> row(4);
+    std::vector<std::vector<std::string>> words(key[0].size(), row);
+
+    std::vector<std::vector<std::string>> key_t = transposed(key);
+
+    words[0] = xor_f(key_t[0], g(key_t[key_t.size() - 1]));
+
+    for (int i = 1; i < key_t.size(); i++) {
+        words[i] = xor_f(key_t[i], words[i - 1]);
+    }
+
+    return transposed(words);
+}
+
+std::vector<std::string> rotWord(std::vector<std::string> word) {
+    // implementation
+}
+std::vector<std::string> subWord(std::vector<std::string> word) {
+    // implementation
+}
+
+std::vector<std::string> roundConst(std::vector<std::string> word) {
+    // implementation
+}
+
+void AES::keyExpansion(){
+    std::vector<std::vector<std::string>> key = keyMatrix;
+
+    for (int i = 0; i < round; i++) {
+        std::vector<std::vector<std::string>> newSubKey = generateSubKeys(key);
+        subKeys.push_back(newSubKey);
+        key = newSubKey;
+    }
 }
 
 std::string AES::getSubString(std::string str, int startindex, int lastindex) {
