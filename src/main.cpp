@@ -4,7 +4,8 @@
 #include <iostream>
 
 int main(){
-    std::string key = "Thats my Kung Fu";
+    //std::string key = "Thats my Kung Fu";
+    std::string key = AES::make_128b_key();
     std::string message = "Two One Nine Two";
 
     AES aes = AES(key);
