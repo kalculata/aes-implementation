@@ -4,29 +4,25 @@
 #include <string>
 #include <iostream>
 
+typedef std::vector<std::string> Vector;
+typedef std::vector <Vector> Matrix;
+
 class AES {
 public:
-	AES(std::string key, int keySize=AES::USE_AES_128, int mode=USE_MODE_EBC);
-	std::string encrypt(std::string plaintext);
-	std::string decrypt(std::string cipher);
+	AES(std::string key, int key_size=AES::USE_AES_128);
+	
+	std::string encrypt(const std::string &plaintext);
+	std::string decrypt(const std::string &cipher);
 
-	static std::string generateKey128();
-	static std::string generateKey192();
-	static std::string generatekey256();
+	static std::string make_128b_key();
+	static std::string make_192b_key();
+	static std::string make_256b_key();
 
-	static const int USE_MODE_CBC = 0;
-	static const int USE_MODE_EBC = 1;
-	static const int USE_AES_128 = 128;
-	static const int USE_AES_192 = 192;
-	static const int USE_AES_256 = 256;
-
-	std::vector<std::vector<std::string>> getKeyMatrix() { return keyMatrix; }
-
-	static std::string subBox(std::string value) {
+	static std::string sub_byte_box(std::string value) {
 		std::string a(1, value[0]);
 		std::string b(1, value[1]);
 
-		std::map<std::string, std::vector<std::string>> sbox = {
+		std::map<std::string, Vector> sbox = {
 					//0    1     2	   3     4     5     6     7     8     9     a     b	 c     d     e     f
 			{"0", { "63", "7c", "77", "7b", "f2", "6b", "6f", "c5", "30", "01", "67", "2b", "fe", "d7", "ab", "76" }},
 			{"1", { "ca", "82", "c9", "7d", "fa", "59", "47", "f0", "ad", "d4", "a2", "af", "9c", "a4", "72", "c0" }},
@@ -48,8 +44,8 @@ public:
 
 		return sbox[a][std::stoi(b, 0, 16)];
 	}
-	static std::vector<std::string> rconsts(int index) {
-		std::map<int, std::vector<std::string>> consts = {
+	static Vector getRoundConst(int index) {
+		std::map<int, Vector> consts = {
 			{1, {"01","00","00","00"}},
 			{2, {"02","00","00","00"}},
 			{3, {"04","00","00","00"}},
@@ -64,43 +60,107 @@ public:
 
 		return consts[index];
 	}
+	static Matrix getStandardMatrix() {
+		return {
+			{"02","03","01","01"},
+			{"01","02","03","01"},
+			{"01","01","02","03"},
+			{"03","01","01","02"},
+		};
+	}
+	static std::vector <std::string> getKeyRefs() {
+		return {
+			"0","1","2","3","4","5","6","7","8","9",
+			"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z",
+			"+","-","/","*","!","?",".", "#","@","(",")","[","]","%","|","\\","$","-","&", ";", ",", "="
+		};
+	}
+	static std::string irreducable_polyn() { return std::string("84310"); };
+	std::vector<Matrix> getSubKeys() { return sub_keys; }
+
+	static const int USE_AES_128 = 128;
+	static const int USE_AES_192 = 192;
+	static const int USE_AES_256 = 256;
+
+	static void test() {
+		std::string a, b, c;
+		a = "6f";
+		b = "73";
+		c = "n";
+		a = hexstr_2_binstr(a);
+		b = hexstr_2_binstr(b);
+
+		std:
+
+		std::cout << a << std::endl;
+		
+		// 1(7210) = 8321
+		// 7210 8321 = 8730
+
+
+		//std::cout << AES::xor_f(a, b);
+	}
+	static void logMatrix(Matrix& matrix) {
+		for (int i = 0; i < matrix.size(); i++) {
+			for (int j = 0; j < matrix[0].size(); j++) {
+				std::cout << matrix[i][j] << "\t";
+			}
+			std::cout << std::endl;
+		}
+		std::cout << "---------------------" << "\n";
+	}
 
 private:
-	static std::vector<int> getRandomRefsIndexs(int number);
-	static std::vector <std::string> keyRefs() {
-		static const std::vector <std::string> refs{
-		"0","1","2","3","4","5","6","7","8","9",
-		"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z",
-		"+","-","/","*","!","?",".", "#","@","(",")","[","]","%","|","\\","$","-","&", ";", ",", "="
-		};
-		return refs;
-	}
-	static std::string generateKey(int size);
-	static std::string getSubString(std::string str, int startindex, int lastindex);
+	// converter
+	static Matrix str_2_matrix(const std::string &str, int row = 4, int col = 4);
+	static std::string str_2_hexstr(const std::string &str);
+	static std::string hexstr_vec_2_binstr(const Vector &vec);
+	static std::string vec_2_str(const Vector &vec);
+	static std::string matrix_2_str(const Matrix &matrix);
+	static std::string binstr_2_hexstr(const std::string &binstr);
+	static std::string hexchar_2_binstr(char &c);
+	static std::string hexstr_2_binstr(std::string &hexstr);
+	static std::string binstr_2_polynrep(std::string& binstr);
+	static std::string polynrep_2_binstr(std::string& polynrep);
+	static std::string binstr_in_gf28(const std::string& binstr);
 
-	static std::vector<std::vector<std::string>> generateSubKey(std::vector<std::vector<std::string>> key, int round);
-	static std::vector<std::string> g(std::vector<std::string> v, int round);
-	static std::vector<std::vector<std::string>> transposed(std::vector<std::vector<std::string>> m);
-	static std::vector<std::string> xor_f(std::vector<std::string> a, std::vector<std::string> b);
 
-	static std::string stringToHex(std::string str);
-	static const char* hex_char_to_bin(char c);
-	static std::string bin_str_to_hex(std::string bin_str);
-	static std::string vecToBin(std::vector<std::string> vec);
-	static std::string vecToString(std::vector<std::string> vec);
-	static std::vector<std::string> rotWord(std::vector<std::string> word);
-	static std::vector<std::string> subWord(std::vector<std::string> word);
-	static std::vector<std::string> addRoundConst(std::vector<std::string> word, int round);
+	// utils
+	static Matrix transposed(const Matrix &matrix);
+	static Matrix multiply(Matrix& a, Matrix& b);
+	static std::string format_bin(std::string &binstr, int length=8);
+	static std::string xor_f(std::string binstr_a, std::string binstr_b);
+	static Matrix xor_f(const Matrix &a, const Matrix &b);
+	static Vector xor_f(const Vector &a, const Vector &b);
+	static Vector g(const Vector &vec, int round);
+	static std::string dot_multiplication(std::string &binstr_a, std::string &binstr_b);
 
-	std::vector<std::vector<std::string>> formatKey();
-	void keyExpansion();
+	// key
+	static std::vector<int> get_random_key_refs(int number);
+	static std::string generate_key(int size);
+	Matrix format_key();
 
-	int keySize = 0;
-	int mode = 0;
+
+	// key expansion
+	static Matrix generate_sub_key(const Matrix &key, int round);
+	static Vector rot_word(const Vector &word, int rot = 1);
+	static Vector sub_word(const Vector &word);
+	static Vector add_round_const(const Vector &word, int round);
+	void key_expansion();
+
+
+	// round ops
+	static void byte_sub(Matrix &matrix);
+	static void shift_rows(Matrix& matrix);
+	static void mix_columns(Matrix& matrix);
+	void add_round_key(Matrix& matrix, int round);
+	Matrix round_ops(Matrix &state_array, int round);
+
+
+	int key_size = 0;
 	int round = 0;
 	std::string key;
-	std::vector<std::vector<std::string>> keyMatrix;
-	std::vector<std::vector<std::vector<std::string>>> subKeys;
+	std::vector<Matrix> sub_keys;
 	std::string plaintext;
 	std::string a[2];
 };

@@ -1,2 +1,6 @@
 .vs/
 x64/
+AES.sln
+AES.vcxproj
+AES.vcxproj.filters
+AES.vcxproj.user
